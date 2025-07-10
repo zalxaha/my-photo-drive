@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Media Upload</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f4f7;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    h1 { margin-bottom: 1rem; }
+    input[type=file] {
+      display: block;
+      margin: 1rem auto;
+      border: 1px dashed #ccc;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      width: 100%;
+    }
+    button {
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #4f46e5;
+    }
+    #status { margin-top: 1rem; }
+    #gallery {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+    #gallery img, #gallery video {
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upload Foto/Video</h1>
+    <form id="uploadForm">
+      <input type="file" name="file" id="fileInput" required />
+      <button type="submit">Upload</button>
+    </form>
+    <div id="status"></div>
+    <h2>📁 Galeri</h2>
+    <div id="gallery"></div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return;
+      const form = new FormData();
+      form.append('file', file);
+
+      const status = document.getElementById('status');
+      status.textContent = 'Mengunggah...';
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: form
+      });
+      const data = await res.json();
+      if (data.ok) {
+        status.innerHTML = `✅ Berhasil! <a href="${data.url}" target="_blank">Lihat file</a>`;
+        loadGallery(); // refresh galeri
+      } else {
+        status.textContent = '❌ Gagal: ' + data.error;
+      }
+    });
+
+    async function loadGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      const res = await fetch('/api/list');
+      const data = await res.json();
+      if (data.ok) {
+        data.files.forEach(file => {
+          const el = document.createElement(file.isImage ? 'img' : 'video');
+          el.src = file.url;
+          if (file.isVideo) el.controls = true;
+          el.loading = 'lazy';
+          gallery.appendChild(el);
+        });
+      } else {
+        gallery.textContent = 'Gagal memuat galeri';
+      }
+    }
+
+    loadGallery();
+  </script>
+</body>
+</html>
