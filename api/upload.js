@@ -2,59 +2,49 @@ const express = require('express');
 const multer = require('multer');
 const { Octokit } = require('@octokit/rest');
 const sanitize = require('sanitize-filename');
-const limiter = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
+
 require('dotenv').config();
 
-const app = express();
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter(_, file, cb) {
-    const allowed = /image\/|video\//.test(file.mimetype);
-    cb(allowed ? null : new Error('File type not allowed'), allowed);
-  }
-});
-
-app.use(limiter({ windowMs: 60_000, max: 30 }));
-
+const router = express.Router();
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-const GH_OWNER = process.env.GH_OWNER;
-const GH_REPO = process.env.GH_REPO;
-const BRANCH = process.env.GH_BRANCH || 'main';
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+router.use(rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipFailedRequests: true
+}));
+
+router.post('/', upload.single('file'), async (req, res) => {
+  if (!req.file) return res.json({ ok: false, error: 'No file uploaded' });
+
+  const fileName = sanitize(req.file.originalname);
+  const path = `uploads/${fileName}`;
+
   try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-    const safeName = Date.now() + '-' + sanitize(req.file.originalname);
     const content = req.file.buffer.toString('base64');
 
     await octokit.repos.createOrUpdateFileContents({
-      owner: GH_OWNER,
-      repo: GH_REPO,
-      path: `uploads/${safeName}`,
-      message: `upload ${safeName}`,
+      owner: process.env.GH_OWNER,
+      repo: process.env.GH_REPO,
+      path,
+      message: `upload ${fileName}`,
       content,
-      branch: BRANCH,
-      committer: {
-        name: 'Upload Bot',
-        email: 'bot@example.com'
-      }
+      branch: process.env.GH_BRANCH
     });
 
     res.json({
       ok: true,
-      url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${safeName}`
+      name: fileName,
+      url: `/api/media/${fileName}`
     });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  } catch (err) {
+    res.json({ ok: false, error: `${err.status} - ${err.response?.data?.documentation_url || err.message}` });
   }
 });
 
-// Import route list
-const listRoute = require('./list');
-app.use(listRoute);
-
-module.exports = app;
+module.exports = router;
