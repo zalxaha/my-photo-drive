@@ -2,5 +2,14 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/", "destination": "/public/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/upload.js": {
+      "maxDuration": 10,
+      "memory": 512
+    },
+    "api/commit.js": {
+      "maxDuration": 10
+    }
+  }
 }
