@@ -2,11 +2,11 @@ const express = require('express');
 const { Octokit } = require('@octokit/rest');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '5mb' })); // ✅ batas upload JSON 5MB
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-app.post('/', async (req, res) => {          // ← gunakan '/' sebagai path
+app.post('/', async (req, res) => {
   const { name, content } = req.body;
 
   if (!name || !content) {
