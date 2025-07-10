@@ -1,57 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Media Upload</title>
+  <title>Upload Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: #f4f4f7;
+      background: #f3f4f6;
       margin: 0;
       padding: 2rem;
-      text-align: center;
+      display: flex;
+      justify-content: center;
     }
     .container {
       max-width: 500px;
-      margin: auto;
-      background: #fff;
+      width: 100%;
+      background: white;
       padding: 2rem;
       border-radius: 1rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
-    h1 { margin-bottom: 1rem; }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
     input[type=file] {
-      display: block;
-      margin: 1rem auto;
-      border: 1px dashed #ccc;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
       width: 100%;
+      margin-bottom: 1rem;
     }
     button {
       background: #6366f1;
-      color: #fff;
+      color: white;
       border: none;
       padding: 0.75rem 1.5rem;
       border-radius: 0.5rem;
-      cursor: pointer;
       font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover {
       background: #4f46e5;
     }
-    #status { margin-top: 1rem; }
-    #gallery {
-      margin-top: 2rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 1rem;
+    #status {
+      margin-top: 1rem;
+      text-align: center;
     }
-    #gallery img, #gallery video {
+    #gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .item img,
+    .item video {
       width: 100%;
-      border-radius: 0.5rem;
+      border-radius: 6px;
+    }
+    .caption {
+      font-size: 12px;
+      margin-top: 5px;
+      word-break: break-word;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .refresh-btn {
+      background: #e5e7eb;
+      color: #111;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .refresh-btn:hover {
+      background: #d1d5db;
+    }
+    a {
+      text-decoration: none;
     }
   </style>
 </head>
@@ -63,8 +102,12 @@
       <button type="submit">Upload</button>
     </form>
     <div id="status"></div>
-    <h2>📁 Galeri</h2>
-    <div id="gallery"></div>
+
+    <div class="top-bar">
+      <h2>📁 Galeri</h2>
+      <button class="refresh-btn" onclick="loadGallery()">🔄 Refresh</button>
+    </div>
+    <div id="gallery">📦 Memuat...</div>
   </div>
 
   <script>
@@ -76,39 +119,79 @@
       form.append('file', file);
 
       const status = document.getElementById('status');
-      status.textContent = 'Mengunggah...';
+      status.textContent = '⏳ Mengunggah...';
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: form
-      });
-      const data = await res.json();
-      if (data.ok) {
-        status.innerHTML = `✅ Berhasil! <a href="${data.url}" target="_blank">Lihat file</a>`;
-        loadGallery(); // refresh galeri
-      } else {
-        status.textContent = '❌ Gagal: ' + data.error;
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: form
+        });
+        const data = await res.json();
+        if (data.ok) {
+          status.innerHTML = `✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a>`;
+          setTimeout(() => loadGallery(), 5000); // Tunggu GitHub update
+        } else {
+          status.textContent = '❌ Gagal: ' + data.error;
+        }
+      } catch (err) {
+        status.textContent = '❌ Error: ' + err.message;
       }
     });
 
     async function loadGallery() {
       const gallery = document.getElementById('gallery');
-      gallery.innerHTML = '';
-      const res = await fetch('/api/list');
-      const data = await res.json();
-      if (data.ok) {
+      gallery.innerHTML = '📦 Memuat...';
+
+      try {
+        const res = await fetch('/api/list');
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.error);
+
+        if (data.files.length === 0) {
+          gallery.innerHTML = '<p>Tidak ada file.</p>';
+          return;
+        }
+
+        gallery.innerHTML = '';
         data.files.forEach(file => {
-          const el = document.createElement(file.isImage ? 'img' : 'video');
-          el.src = file.url;
-          if (file.isVideo) el.controls = true;
-          el.loading = 'lazy';
-          gallery.appendChild(el);
+          const item = document.createElement('div');
+          item.className = 'item';
+
+          const link = document.createElement('a');
+          link.href = file.url;
+          link.download = file.name;
+          link.target = '_blank';
+
+          let media;
+          if (file.isImage) {
+            media = document.createElement('img');
+            media.src = file.url;
+            media.alt = file.name;
+          } else if (file.isVideo) {
+            media = document.createElement('video');
+            media.src = file.url;
+            media.controls = true;
+          } else {
+            media = document.createElement('div');
+            media.textContent = '📄 ' + file.name;
+          }
+
+          const caption = document.createElement('div');
+          caption.className = 'caption';
+          caption.textContent = file.name;
+
+          link.appendChild(media);
+          item.appendChild(link);
+          item.appendChild(caption);
+          gallery.appendChild(item);
         });
-      } else {
-        gallery.textContent = 'Gagal memuat galeri';
+      } catch (err) {
+        gallery.innerHTML = `<p style="color:red;">Gagal memuat galeri: ${err.message}</p>`;
       }
     }
 
+    // Muat galeri pertama kali
     loadGallery();
   </script>
 </body>
