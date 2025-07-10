@@ -1,6 +1,7 @@
 const multer = require('multer');
 const sanitize = require('sanitize-filename');
 const express = require('express');
+
 const app = express();
 
 const upload = multer({
@@ -12,16 +13,14 @@ const upload = multer({
   }
 });
 
-app.post(upload.single('file'), async (req, res) => {
+app.post('/api/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Tidak ada file' });
 
   const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
   const base64 = req.file.buffer.toString('base64');
 
-  // ✅ Balas duluan agar tidak timeout
   res.json({ status: 'proses', filename: safeName });
 
-  // ⏳ Upload ke GitHub secara async
   fetch(`${process.env.APP_URL}/api/commit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -29,4 +28,6 @@ app.post(upload.single('file'), async (req, res) => {
   }).catch(console.error);
 });
 
+// ⛔️ Vercel butuh export handler, bukan listen()
+// ✅ Ekspor app handler agar bisa jalan di Vercel
 module.exports = app;
