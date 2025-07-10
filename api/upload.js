@@ -1,12 +1,13 @@
+const express = require('express');
 const multer = require('multer');
 const sanitize = require('sanitize-filename');
-const express = require('express');
+const fetch = require('node-fetch'); // ✅ ini penting
 
 const app = express();
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 }, // batas 25MB
+  limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter(_, file, cb) {
     const ok = /image\/|video\//.test(file.mimetype);
     cb(ok ? null : new Error('Hanya gambar/video yang diizinkan'), ok);
@@ -19,11 +20,11 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
   const base64 = req.file.buffer.toString('base64');
 
-  // ✅ Balas duluan agar tidak timeout
+  // ✅ balas duluan
   res.json({ status: 'sedang diproses', filename: safeName });
 
-  // ✅ Commit ke GitHub di background
-  const origin = 'https://my-photo-drive.vercel.app'; // langsung ditulis URL-nya
+  // ✅ commit async
+  const origin = 'https://my-photo-drive.vercel.app';
 
   fetch(`${origin}/api/commit`, {
     method: 'POST',
