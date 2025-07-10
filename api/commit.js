@@ -6,7 +6,7 @@ app.use(express.json());
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-app.post(async (req, res) => {
+app.post('/', async (req, res) => {          // ← gunakan '/' sebagai path
   const { name, content } = req.body;
 
   if (!name || !content) {
