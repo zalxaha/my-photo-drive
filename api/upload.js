@@ -1,65 +1,32 @@
-const express  = require('express');
-const multer   = require('multer');
-const { Octokit } = require('@octokit/rest');
+const multer = require('multer');
 const sanitize = require('sanitize-filename');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
-
+const express = require('express');
 const app = express();
-
-// ⬇️ beri tahu Express soal proxy
-app.set('trust proxy', 1);
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },    // 10 MB
+  limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter(_, file, cb) {
     const ok = /image\/|video\//.test(file.mimetype);
-    cb(ok ? null : new Error('File type not allowed'), ok);
+    cb(ok ? null : new Error('Hanya gambar/video'), ok);
   }
 });
 
-// Rate-limiter
-app.use(rateLimit({
-  windowMs: 60_000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false
-}));
+app.post(upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Tidak ada file' });
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
+  const base64 = req.file.buffer.toString('base64');
 
-const { GH_OWNER, GH_REPO } = process.env;
-const BRANCH = process.env.GH_BRANCH || 'main';
+  // ✅ Balas duluan agar tidak timeout
+  res.json({ status: 'proses', filename: safeName });
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-    const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
-    const content  = req.file.buffer.toString('base64');
-
-    await octokit.repos.createOrUpdateFileContents({
-      owner: GH_OWNER,
-      repo: GH_REPO,
-      path: `uploads/${safeName}`,
-      message: `upload ${safeName}`,
-      content,
-      branch: BRANCH,
-      committer: { name: 'Upload Bot', email: 'bot@example.com' }
-    });
-
-    res.json({
-      ok: true,
-      url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${safeName}`
-    });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  // ⏳ Upload ke GitHub secara async
+  fetch(`${process.env.APP_URL}/api/commit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: safeName, content: base64 })
+  }).catch(console.error);
 });
-
-// daftar file
-const listRoute = require('./list');
-app.use(listRoute);
 
 module.exports = app;
