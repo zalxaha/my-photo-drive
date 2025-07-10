@@ -3,27 +3,34 @@ const { Octokit } = require('@octokit/rest');
 require('dotenv').config();
 
 const router = express.Router();
+
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-router.get('/', async (req, res) => {
+const GH_OWNER = process.env.GH_OWNER;
+const GH_REPO = process.env.GH_REPO;
+const BRANCH = process.env.GH_BRANCH || 'main';
+
+router.get('/api/list', async (req, res) => {
   try {
     const { data } = await octokit.repos.getContent({
-      owner: process.env.GH_OWNER,
-      repo: process.env.GH_REPO,
+      owner: GH_OWNER,
+      repo: GH_REPO,
       path: 'uploads',
-      ref: process.env.GH_BRANCH
+      ref: BRANCH
     });
 
-    const files = (Array.isArray(data) ? data : []).map(f => ({
-      name: f.name,
-      url: `/api/media/${f.name}`,
-      isImage: f.name.match(/\.(jpg|jpeg|png|webp)$/i),
-      isVideo: f.name.match(/\.(mp4|mov|webm)$/i)
-    }));
+    const files = data
+      .filter(f => f.type === 'file')
+      .map(f => ({
+        name: f.name,
+        url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${f.name}`,
+        isImage: f.name.match(/\.(png|jpe?g|gif|webp)$/i),
+        isVideo: f.name.match(/\.(mp4|webm|mov)$/i)
+      }));
 
     res.json({ ok: true, files });
   } catch (err) {
-    res.json({ ok: false, error: `${err.status} - ${err.response?.data?.documentation_url || err.message}` });
+    res.status(500).json({ error: err.message });
   }
 });
 
