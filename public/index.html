@@ -6,192 +6,241 @@
   <title>Upload Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
+    /* ---------- GLOBAL ---------- */
+    *{box-sizing:border-box}
+    body{
+      font-family:'Poppins',sans-serif;
+      background:#f3f4f6;
+      margin:0;
+      padding:2rem;
+      display:flex;
+      justify-content:center;
     }
-    .container {
-      max-width: 500px;
-      width: 100%;
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    a{text-decoration:none}
+
+    /* ---------- CARD ---------- */
+    .container{
+      max-width:520px;
+      width:100%;
+      background:#fff;
+      padding:2rem;
+      border-radius:1rem;
+      box-shadow:0 10px 25px rgba(0,0,0,.08);
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
+    h1{text-align:center;margin:0 0 1.5rem}
+
+    /* ---------- FILE PICKER ---------- */
+    .file-wrapper{
+      border:2px dashed #d1d5db;
+      border-radius:.75rem;
+      padding:1.25rem;
+      display:flex;
+      gap:.75rem;
+      align-items:center;
+      margin-bottom:1.25rem;
+      transition:border-color .25s;
     }
-    input[type=file] {
-      width: 100%;
-      margin-bottom: 1rem;
+    .file-wrapper:hover{border-color:#6366f1}
+    .file-wrapper input[type=file]{
+      flex:1;
+      border:none;
     }
-    button {
-      background: #6366f1;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+
+    /* ---------- BUTTON ---------- */
+    button{
+      background:#6366f1;
+      color:#fff;
+      border:none;
+      padding:.75rem 1.5rem;
+      border-radius:.5rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:background .3s;
     }
-    button:hover {
-      background: #4f46e5;
+    button:hover{background:#4f46e5}
+
+    /* ---------- STATUS ---------- */
+    #status{margin-top:1rem;text-align:center}
+
+    /* ---------- TOP BAR ---------- */
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:2rem;
     }
-    #status {
-      margin-top: 1rem;
-      text-align: center;
+    .refresh-btn{
+      position:relative;
+      background:#e5e7eb;
+      color:#111;
+      border:none;
+      padding:.55rem .9rem .55rem 2.1rem;   /* ekstra ruang kiri utk ikon */
+      border-radius:6px;
+      font-size:14px;
+      font-weight:500;
+      cursor:pointer;
+      overflow:hidden;                      /* untuk ikon absolut */
+      transition:background .25s;
     }
-    #gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
+    .refresh-btn:hover{background:#d1d5db;}
+
+    /* ---------- REFRESH ICON ---------- */
+    .refresh-btn::before{
+      content:"\21BB";                       /* karakter panah ganda melingkar */
+      position:absolute;
+      left:.8rem;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:1.1rem;
+      display:inline-block;
+      transition:transform .4s linear;
     }
-    .item {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 8px;
-      text-align: center;
-      overflow: hidden;
+    /* animasi berputar saat tombol dapat class 'loading' */
+    .refresh-btn.loading::before{
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{
+      0%{transform:translateY(-50%) rotate(0deg)}
+      100%{transform:translateY(-50%) rotate(360deg)}
+    }
+
+    /* ---------- GALLERY ---------- */
+    #gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+      gap:1rem;
+      margin-top:1rem;
+    }
+    .item{
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:8px;
+      padding:8px;
+      text-align:center;
+      overflow:hidden;
     }
     .item img,
-    .item video {
-      width: 100%;
-      border-radius: 6px;
+    .item video{
+      width:100%;
+      border-radius:6px;
     }
-    .caption {
-      font-size: 12px;
-      margin-top: 5px;
-      word-break: break-word;
-    }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2rem;
-    }
-    .refresh-btn {
-      background: #e5e7eb;
-      color: #111;
-      border: none;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .refresh-btn:hover {
-      background: #d1d5db;
-    }
-    a {
-      text-decoration: none;
+    .caption{
+      font-size:12px;
+      margin-top:5px;
+      word-break:break-word;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Upload Foto/Video</h1>
+
+    <!-- FILE PICKER RAPI -->
     <form id="uploadForm">
-      <input type="file" name="file" id="fileInput" required />
-      <button type="submit">Upload</button>
+      <div class="file-wrapper">
+        <input type="file" name="file" id="fileInput" required/>
+        <button type="submit">Upload</button>
+      </div>
     </form>
+
     <div id="status"></div>
 
+    <!-- GALERI -->
     <div class="top-bar">
       <h2>📁 Galeri</h2>
-      <button class="refresh-btn" onclick="loadGallery()">🔄 Refresh</button>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadGallery()">Refresh</button>
     </div>
     <div id="gallery">📦 Memuat...</div>
   </div>
 
   <script>
-    document.getElementById('uploadForm').addEventListener('submit', async e => {
+    // ---------- UPLOAD ----------
+    document.getElementById('uploadForm').addEventListener('submit', async e=>{
       e.preventDefault();
-      const file = document.getElementById('fileInput').files[0];
-      if (!file) return;
-      const form = new FormData();
-      form.append('file', file);
+      const file=document.getElementById('fileInput').files[0];
+      if(!file) return;
 
-      const status = document.getElementById('status');
-      status.textContent = '⏳ Mengunggah...';
+      const form=new FormData();
+      form.append('file',file);
 
-      try {
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: form
-        });
-        const data = await res.json();
-        if (data.ok) {
-          status.innerHTML = `✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a>`;
-          setTimeout(() => loadGallery(), 5000); // Tunggu GitHub update
-        } else {
-          status.textContent = '❌ Gagal: ' + data.error;
+      const status=document.getElementById('status');
+      status.textContent='⏳ Mengunggah...';
+
+      try{
+        const res=await fetch('/api/upload',{method:'POST',body:form});
+        const data=await res.json();
+
+        if(data.ok){
+          status.innerHTML=`✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a>`;
+          setTimeout(loadGallery,3000); // beri jeda kecil agar file muncul
+        }else{
+          status.textContent='❌ Gagal: '+data.error;
         }
-      } catch (err) {
-        status.textContent = '❌ Error: ' + err.message;
+      }catch(err){
+        status.textContent='❌ Error: '+err.message;
       }
     });
 
-    async function loadGallery() {
-      const gallery = document.getElementById('gallery');
-      gallery.innerHTML = '📦 Memuat...';
+    // ---------- GALERI ----------
+    async function loadGallery(){
+      const gallery=document.getElementById('gallery');
+      const refreshBtn=document.getElementById('refreshBtn');
 
-      try {
-        const res = await fetch('/api/list');
-        const data = await res.json();
+      // tampilkan animasi loading
+      refreshBtn.classList.add('loading');
+      gallery.innerHTML='📦 Memuat...';
 
-        if (!data.ok) throw new Error(data.error);
+      try{
+        const res=await fetch('/api/list');
+        const data=await res.json();
+        if(!data.ok) throw new Error(data.error);
 
-        if (data.files.length === 0) {
-          gallery.innerHTML = '<p>Tidak ada file.</p>';
-          return;
+        gallery.innerHTML='';
+        if(data.files.length===0){
+          gallery.innerHTML='<p>Tidak ada file.</p>';
+        }else{
+          data.files.forEach(file=>{
+            const item=document.createElement('div');
+            item.className='item';
+
+            const link=document.createElement('a');
+            link.href=file.url;
+            link.download=file.name;
+            link.target='_blank';
+
+            let media;
+            if(file.isImage){
+              media=document.createElement('img');
+              media.src=file.url;
+              media.alt=file.name;
+            }else if(file.isVideo){
+              media=document.createElement('video');
+              media.src=file.url;
+              media.controls=true;
+            }else{
+              media=document.createElement('div');
+              media.textContent='📄 '+file.name;
+            }
+
+            const caption=document.createElement('div');
+            caption.className='caption';
+            caption.textContent=file.name;
+
+            link.appendChild(media);
+            item.appendChild(link);
+            item.appendChild(caption);
+            gallery.appendChild(item);
+          });
         }
-
-        gallery.innerHTML = '';
-        data.files.forEach(file => {
-          const item = document.createElement('div');
-          item.className = 'item';
-
-          const link = document.createElement('a');
-          link.href = file.url;
-          link.download = file.name;
-          link.target = '_blank';
-
-          let media;
-          if (file.isImage) {
-            media = document.createElement('img');
-            media.src = file.url;
-            media.alt = file.name;
-          } else if (file.isVideo) {
-            media = document.createElement('video');
-            media.src = file.url;
-            media.controls = true;
-          } else {
-            media = document.createElement('div');
-            media.textContent = '📄 ' + file.name;
-          }
-
-          const caption = document.createElement('div');
-          caption.className = 'caption';
-          caption.textContent = file.name;
-
-          link.appendChild(media);
-          item.appendChild(link);
-          item.appendChild(caption);
-          gallery.appendChild(item);
-        });
-      } catch (err) {
-        gallery.innerHTML = `<p style="color:red;">Gagal memuat galeri: ${err.message}</p>`;
+      }catch(err){
+        gallery.innerHTML=`<p style="color:red;">Gagal memuat galeri: ${err.message}</p>`;
+      }finally{
+        // hentikan animasi
+        refreshBtn.classList.remove('loading');
       }
     }
 
-    // Muat galeri pertama kali
+    // muat saat pertama kali
     loadGallery();
   </script>
 </body>
