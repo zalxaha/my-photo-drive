@@ -6,10 +6,10 @@ const app = express();
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 }, // batas 25MB
   fileFilter(_, file, cb) {
     const ok = /image\/|video\//.test(file.mimetype);
-    cb(ok ? null : new Error('Hanya gambar/video'), ok);
+    cb(ok ? null : new Error('Hanya gambar/video yang diizinkan'), ok);
   }
 });
 
@@ -19,15 +19,17 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
   const base64 = req.file.buffer.toString('base64');
 
-  res.json({ status: 'proses', filename: safeName });
+  // ✅ Balas duluan agar tidak timeout
+  res.json({ status: 'sedang diproses', filename: safeName });
 
-  fetch(`${process.env.APP_URL}/api/commit`, {
+  // ✅ Commit ke GitHub di background
+  const origin = 'https://my-photo-drive.vercel.app'; // langsung ditulis URL-nya
+
+  fetch(`${origin}/api/commit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: safeName, content: base64 })
   }).catch(console.error);
 });
 
-// ⛔️ Vercel butuh export handler, bukan listen()
-// ✅ Ekspor app handler agar bisa jalan di Vercel
 module.exports = app;
