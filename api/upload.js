@@ -1,22 +1,25 @@
-const express = require('express');
-const multer = require('multer');
+const express  = require('express');
+const multer   = require('multer');
 const { Octokit } = require('@octokit/rest');
 const sanitize = require('sanitize-filename');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
-app.set('trust proxy', 1); // Fix X-Forwarded-For error
+
+// ⬇️ beri tahu Express soal proxy
+app.set('trust proxy', 1);
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 10 * 1024 * 1024 },    // 10 MB
   fileFilter(_, file, cb) {
     const ok = /image\/|video\//.test(file.mimetype);
     cb(ok ? null : new Error('File type not allowed'), ok);
   }
 });
 
+// Rate-limiter
 app.use(rateLimit({
   windowMs: 60_000,
   max: 30,
@@ -25,8 +28,8 @@ app.use(rateLimit({
 }));
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-const GH_OWNER = process.env.GH_OWNER;
-const GH_REPO = process.env.GH_REPO;
+
+const { GH_OWNER, GH_REPO } = process.env;
 const BRANCH = process.env.GH_BRANCH || 'main';
 
 app.post('/api/upload', upload.single('file'), async (req, res) => {
@@ -34,7 +37,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
-    const content = req.file.buffer.toString('base64');
+    const content  = req.file.buffer.toString('base64');
 
     await octokit.repos.createOrUpdateFileContents({
       owner: GH_OWNER,
@@ -48,14 +51,14 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     res.json({
       ok: true,
-      url: `/api/image/${safeName}` // pakai proxy endpoint
+      url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${safeName}`
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// Import route file
+// daftar file
 const listRoute = require('./list');
 app.use(listRoute);
 
