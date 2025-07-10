@@ -129,7 +129,7 @@
         const data = await res.json();
         if (data.ok) {
           status.innerHTML = `✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a>`;
-          setTimeout(() => loadGallery(), 5000); // Tunggu GitHub update
+          setTimeout(() => loadGallery(), 3000);
         } else {
           status.textContent = '❌ Gagal: ' + data.error;
         }
@@ -179,7 +179,13 @@
 
           const caption = document.createElement('div');
           caption.className = 'caption';
-          caption.textContent = file.name;
+
+          const date = new Date(file.date);
+          const formattedDate = file.date
+            ? `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+            : 'Tidak diketahui';
+
+          caption.innerHTML = `<strong>${file.name}</strong><br><small>📅 ${formattedDate}</small>`;
 
           link.appendChild(media);
           item.appendChild(link);
@@ -191,7 +197,7 @@
       }
     }
 
-    // Muat galeri pertama kali
+    // Load pertama
     loadGallery();
   </script>
 </body>
