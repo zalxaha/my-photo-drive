@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="id" data-theme="">
+<!DOCTYPE html>
+<html lang="id" data-theme="">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -18,180 +19,157 @@
       --status-success: #16a34a;
       --status-error: #dc2626;
       --status-info: #2563eb;
-    }[data-theme="dark"] {
-  --bg: #111827;
-  --fg: #f9fafb;
-  --container-bg: #1f2937;
-  --border-color: #374151;
-  --primary: #818cf8;
-  --primary-hover: #6366f1;
-  --btn-bg: #374151;
-  --btn-hover: #4b5563;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-  margin: 0;
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  transition: background 0.3s, color 0.3s;
-}
-
-.container {
-  max-width: 520px;
-  width: 100%;
-  background: var(--container-bg);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.file-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border: 2px dashed var(--border-color);
-  padding: 1.25rem;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-}
-
-.file-wrapper input[type="file"] {
-  font-family: inherit;
-}
-
-.file-wrapper button {
-  background: var(--primary);
-  color: white;
-  font-weight: bold;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.file-wrapper button:hover {
-  background: var(--primary-hover);
-}
-
-.file-info {
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status {
-  margin-top: 1rem;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid var(--status-info);
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.top-bar h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
-
-.controls {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.controls button {
-  flex: 1;
-  background: var(--btn-bg);
-  color: var(--fg);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.controls button:hover {
-  background: var(--btn-hover);
-}
-
-.refresh-btn.loading svg {
-  animation: spin-left 1s linear infinite;
-}
-
-@keyframes spin-left {
-  0% {transform: rotate(0deg);}
-  100% {transform: rotate(-360deg);}
-}
-
-#gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.gallery-list #gallery {
-  display: flex !important;
-  flex-direction: column;
-}
-
-.item {
-  background: var(--container-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  overflow: hidden;
-}
-
-.item img, .item video {
-  width: 100%;
-  border-radius: 6px;
-}
-
-.caption {
-  font-size: 12px;
-  margin-top: 5px;
-  word-break: break-word;
-}
-
-@media (max-width: 480px) {
-  .controls {
-    flex-direction: column;
-  }
-}
-
+    }
+    [data-theme="dark"] {
+      --bg: #111827;
+      --fg: #f9fafb;
+      --container-bg: #1f2937;
+      --border-color: #374151;
+      --primary: #818cf8;
+      --primary-hover: #6366f1;
+      --btn-bg: #374151;
+      --btn-hover: #4b5563;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
+      max-width: 520px;
+      width: 100%;
+      background: var(--container-bg);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .file-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      border: 2px dashed var(--border-color);
+      padding: 1.25rem;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+    .file-wrapper input[type="file"] {
+      font-family: inherit;
+    }
+    .file-wrapper button {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .file-wrapper button:hover {
+      background: var(--primary-hover);
+    }
+    .file-info {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 3px solid var(--status-info);
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .top-bar h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      flex: 1;
+      background: var(--btn-bg);
+      color: var(--fg);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .controls button:hover {
+      background: var(--btn-hover);
+    }
+    .refresh-btn.loading svg {
+      animation: spin-left 1s linear infinite;
+    }
+    @keyframes spin-left {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(-360deg);}
+    }
+    #gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .gallery-list #gallery {
+      display: flex !important;
+      flex-direction: column;
+    }
+    .item {
+      background: var(--container-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .item img, .item video {
+      width: 100%;
+      border-radius: 6px;
+    }
+    .caption {
+      font-size: 12px;
+      margin-top: 5px;
+      word-break: break-word;
+    }
+    @media (max-width: 480px) {
+      .controls {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -208,40 +186,42 @@ h1 {
           Maksimal ukuran file: <strong>5MB</strong>
         </div>
       </div>
-    </form><div id="status"></div>
+    </form>
+    <div id="status"></div>
 
-<div class="top-bar">
-  <h2>
-    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M5 3a2 2 0 00-2 2v4h6V3H5zm8 0v6h6V5a2 2 0 00-2-2h-4zm6 8h-6v6h4a2 2 0 002-2v-4zm-8 6v-6H3v4a2 2 0 002 2h4z"/>
-    </svg>
-    Galeri
-  </h2>
-  <div class="controls">
-    <button type="button" onclick="toggleView()">
-      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/>
-      </svg> Tampilan
-    </button>
-    <button type="button" onclick="toggleTheme()">
-      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 3a9 9 0 100 18 9 9 0 000-18zM2 12a10 10 0 1110 10A10 10 0 012 12z"/>
-      </svg> Mode
-    </button>
-    <button type="button" class="refresh-btn" id="refreshBtn" onclick="loadGallery()">
-      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6s-2.7 6-6 6a6 6 0 01-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z"/>
-      </svg> Refresh
-    </button>
+    <div class="top-bar">
+      <h2>
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M5 3a2 2 0 00-2 2v4h6V3H5zm8 0v6h6V5a2 2 0 00-2-2h-4zm6 8h-6v6h4a2 2 0 002-2v-4zm-8 6v-6H3v4a2 2 0 002 2h4z"/>
+        </svg>
+        Galeri
+      </h2>
+      <div class="controls">
+        <button type="button" onclick="toggleView()">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/>
+          </svg> Tampilan
+        </button>
+        <button type="button" onclick="toggleTheme()">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3a9 9 0 100 18 9 9 0 000-18zM2 12a10 10 0 1110 10A10 10 0 012 12z"/>
+          </svg> Mode
+        </button>
+        <button type="button" class="refresh-btn" id="refreshBtn" onclick="loadGallery()">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6s-2.7 6-6 6a6 6 0 01-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z"/>
+          </svg> Refresh
+        </button>
+      </div>
+    </div>
+
+    <label for="filterDate" style="display:block;margin-top:1rem;">Filter berdasarkan tanggal upload:</label>
+    <input type="date" id="filterDate" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc;"/>
+
+    <div id="gallery">Memuat...</div>
   </div>
-</div>
 
-<label for="filterDate" style="display:block;margin-top:1rem;">Filter berdasarkan tanggal upload:</label>
-<input type="date" id="filterDate" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc;"/>
-
-<div id="gallery">Memuat...</div>
-
-  </div>  <script>
+  <script>
     const root = document.documentElement;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     const galleryContainer = document.body;
@@ -311,7 +291,9 @@ h1 {
         if (!data.ok) throw new Error(data.error);
 
         const filterDate = document.getElementById('filterDate').value;
-        const filtered = filterDate ? data.files.filter(f => f.date.startsWith(filterDate)) : data.files;
+        const filtered = filterDate
+          ? data.files.filter(f => f.date && f.date.slice(0, 10) === filterDate)
+          : data.files;
 
         if (filtered.length === 0) {
           gallery.innerHTML = '<p>Tidak ada file untuk tanggal ini.</p>';
@@ -360,5 +342,6 @@ h1 {
     }
 
     loadGallery();
-  </script></body>
+  </script>
+</body>
 </html>
