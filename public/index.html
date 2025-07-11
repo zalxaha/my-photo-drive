@@ -311,7 +311,7 @@ h1 {
         if (!data.ok) throw new Error(data.error);
 
         const filterDate = document.getElementById('filterDate').value;
-        const filtered = filterDate ? data.files.filter(f => f.date.startsWith(filterDate)) : data.files;
+        const filtered = data.files.filter(file => file.date && file.date.startsWith(selectedDate));
 
         if (filtered.length === 0) {
           gallery.innerHTML = '<p>Tidak ada file untuk tanggal ini.</p>';
