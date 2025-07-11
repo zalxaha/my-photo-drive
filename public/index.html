@@ -6,7 +6,6 @@
   <title>Upload Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Semua CSS sama seperti sebelumnya */
     :root {
       --bg: #f3f4f6;
       --fg: #111;
@@ -216,7 +215,14 @@
     </div>
 
     <label for="filterDate" style="display:block;margin-top:1rem;">Filter berdasarkan tanggal upload:</label>
-    <input type="date" id="filterDate" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc;"/>
+    <input type="date" id="filterDate" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc; width: 100%;" />
+
+    <label for="filterType" style="display:block;">Tampilkan:</label>
+    <select id="filterType" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc; width: 100%;">
+      <option value="all">Semua</option>
+      <option value="image">Gambar Saja</option>
+      <option value="video">Video Saja</option>
+    </select>
 
     <div id="gallery">Memuat...</div>
   </div>
@@ -291,12 +297,19 @@
         if (!data.ok) throw new Error(data.error);
 
         const filterDate = document.getElementById('filterDate').value;
-        const filtered = filterDate
-          ? data.files.filter(f => f.date && f.date.slice(0, 10) === filterDate)
-          : data.files;
+        const filterType = document.getElementById('filterType').value;
+
+        const filtered = data.files.filter(f => {
+          const matchDate = filterDate ? (f.date && f.date.slice(0, 10) === filterDate) : true;
+          const matchType =
+            filterType === 'image' ? f.isImage :
+            filterType === 'video' ? f.isVideo :
+            true;
+          return matchDate && matchType;
+        });
 
         if (filtered.length === 0) {
-          gallery.innerHTML = '<p>Tidak ada file untuk tanggal ini.</p>';
+          gallery.innerHTML = '<p>Tidak ada file sesuai filter.</p>';
           return;
         }
 
