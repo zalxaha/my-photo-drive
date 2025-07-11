@@ -295,36 +295,27 @@
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result.split(',')[1];
-        status.innerHTML = `<div class="status loading"><div class="spinner"></div> Mengunggah...</div>`;
+      const form = new FormData();
+      form.append('file', file);
+      status.innerHTML = `<div class="status loading"><div class="spinner"></div> Mengunggah...</div>`;
 
-        try {
-          const res = await fetch('/api/upload-blob', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              filename: file.name,
-              mimetype: file.type,
-              content: base64
-            })
-          });
+      try {
+        const res = await fetch('/api/upload-blob', {
+          method: 'POST',
+          body: form
+        });
 
-          const data = await res.json();
-          if (data.ok) {
-            status.innerHTML = `<div class="status success">✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a></div>`;
-            fileInput.value = '';
-            setTimeout(() => loadGallery(), 2000);
-          } else {
-            status.innerHTML = `<div class="status error">❌ Gagal: ${data.error}</div>`;
-          }
-        } catch (err) {
-          status.innerHTML = `<div class="status error">❌ Error: ${err.message}</div>`;
+        const data = await res.json();
+        if (data.ok) {
+          status.innerHTML = `<div class="status success">✅ Berhasil! <a href="${data.url}" target="_blank">Lihat</a></div>`;
+          fileInput.value = '';
+          setTimeout(() => loadGallery(), 2000);
+        } else {
+          status.innerHTML = `<div class="status error">❌ Gagal: ${data.error}</div>`;
         }
-      };
-
-      reader.readAsDataURL(file);
+      } catch (err) {
+        status.innerHTML = `<div class="status error">❌ Error: ${err.message}</div>`;
+      }
     });
 
     async function loadGallery() {
