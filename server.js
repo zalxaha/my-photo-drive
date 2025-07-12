@@ -1,69 +1,44 @@
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
-const bodyParser = require('body-parser');
-require('dotenv').config();
-
+const dotenv = require('dotenv');
+const multer = require('multer');
 const uploadHandler = require('./api/upload');
 const listHandler = require('./api/list');
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ganti sesuai keinginan
 const USERNAME = process.env.LOGIN_USER || 'vinx';
 const PASSWORD = process.env.LOGIN_PASS || '123456';
 
-// Session setup
-app.use(session({
-  secret: 'rahasia-sesi-anda',
-  resave: false,
-  saveUninitialized: true,
-}));
+// Basic Auth middleware
+app.use((req, res, next) => {
+  const auth = req.headers.authorization;
+  if (!auth) return unauthorized(res);
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
+  const [scheme, base64] = auth.split(' ');
+  if (scheme !== 'Basic') return unauthorized(res);
 
-// Middleware proteksi login
-function requireLogin(req, res, next) {
-  if (req.session.loggedIn) return next();
-  if (req.path === '/login' || req.path === '/login.html' || req.path === '/logout') return next();
-  return res.redirect('/login.html');
+  const [user, pass] = Buffer.from(base64, 'base64').toString().split(':');
+  if (user === USERNAME && pass === PASSWORD) return next();
+
+  return unauthorized(res);
+});
+
+function unauthorized(res) {
+  res.set('WWW-Authenticate', 'Basic realm="Login Required"');
+  return res.status(401).send('Authentication required.');
 }
-
-// Route login (GET form)
-app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/login.html'));
-});
-
-// Route login (POST proses login)
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  if (username === USERNAME && password === PASSWORD) {
-    req.session.loggedIn = true;
-    return res.redirect('/');
-  }
-  return res.send('Login gagal. <a href="/login.html">Coba lagi</a>');
-});
-
-// Logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login.html');
-  });
-});
-
-// Lindungi semua route setelah ini
-app.use(requireLogin);
 
 // API routes
 app.use('/api/upload', uploadHandler);
 app.use('/api/list', listHandler);
 
-// Static files
+// Serve static HTML files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server berjalan di http://localhost:${PORT}`);
+  console.log(`✅ Server jalan di http://localhost:${PORT}`);
 });
