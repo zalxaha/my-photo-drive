@@ -1,14 +1,15 @@
+// routes/list.js
+
 const express = require('express');
-const { Octokit } = require('@octokit/rest');
-require('dotenv').config();
-
 const router = express.Router();
+const { Octokit } = require('octokit');
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
+const GH_TOKEN = process.env.GH_TOKEN;
 const GH_OWNER = process.env.GH_OWNER;
 const GH_REPO = process.env.GH_REPO;
 const BRANCH = process.env.GH_BRANCH || 'main';
+
+const octokit = new Octokit({ auth: GH_TOKEN });
 
 router.get('/api/list', async (req, res) => {
   try {
@@ -19,31 +20,24 @@ router.get('/api/list', async (req, res) => {
       ref: BRANCH
     });
 
-    const files = await Promise.all(
-      data
-        .filter(f => f.type === 'file')
-        .map(async (f) => {
-          const [timestamp, ...rest] = f.name.split('-');
-          const name = rest.join('-') || f.name;
-          const tsNumber = Number(timestamp);
-          const isValid = !isNaN(tsNumber) && tsNumber > 1e12;
+    const files = (Array.isArray(data) ? data : []).filter(f => f.type === 'file').map(f => {
+      const [timestamp, ...rest] = f.name.split('-');
+      const fileName = rest.join('-');
+      const fileDate = new Date(Number(timestamp));
 
-          // Buat URL file dari GitHub API dengan header Authorization nanti di fetch frontend
-          const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/uploads/${f.name}?ref=${BRANCH}`;
-
-          return {
-            name,
-            url: apiUrl,
-            isImage: f.name.match(/\.(png|jpe?g|gif|webp)$/i),
-            isVideo: f.name.match(/\.(mp4|webm|mov)$/i),
-            date: isValid ? new Date(tsNumber).toISOString() : null
-          };
-        })
-    );
+      return {
+        name: fileName,
+        url: f.download_url,
+        isImage: /\.(jpe?g|png|webp|gif)$/i.test(f.name),
+        isVideo: /\.(mp4|webm|mov)$/i.test(f.name),
+        date: isNaN(fileDate) ? null : fileDate.toISOString()
+      };
+    });
 
     res.json({ ok: true, files });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.error('❌ Error fetching file list:', error);
+    res.status(500).json({ ok: false, error: 'Failed to fetch file list' });
   }
 });
 
