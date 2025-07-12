@@ -1,15 +1,20 @@
 {
   "name": "my-photo-drive",
   "version": "1.0.0",
-  "main": "api/upload.js",
+  "main": "server.js",
   "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "dotenv": "^16.4.5", 
     "@octokit/rest": "^20.0.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
+    "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
-    "node-fetch": "^2.6.7", 
+    "node-fetch": "^2.6.7",
     "sanitize-filename": "^1.6.3"
   }
 }
