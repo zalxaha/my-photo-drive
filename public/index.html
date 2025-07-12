@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="id" data-theme="">
+<!DOCTYPE html><html lang="id" data-theme="">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Upload Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f3f4f6;
+      --bg: #f9fafb;
       --fg: #111;
       --container-bg: #fff;
       --border-color: #d1d5db;
@@ -29,6 +28,9 @@
       --btn-bg: #374151;
       --btn-hover: #4b5563;
     }
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg);
@@ -37,132 +39,84 @@
       padding: 2rem;
       display: flex;
       justify-content: center;
-      transition: background 0.3s, color 0.3s;
+      align-items: center;
+      min-height: 100vh;
     }
     .container {
-      max-width: 520px;
-      width: 100%;
       background: var(--container-bg);
       padding: 2rem;
       border-radius: 1rem;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 500px;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
-    .file-wrapper {
+    form, .controls, .file-wrapper, .status {
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      border: 2px dashed var(--border-color);
-      padding: 1.25rem;
-      border-radius: 1rem;
-      margin-bottom: 1rem;
     }
-    .file-wrapper input[type="file"] {
-      font-family: inherit;
-    }
-    .file-wrapper button {
-      background: var(--primary);
-      color: white;
-      font-weight: bold;
+    input[type="file"], input[type="password"], select, input[type="date"] {
       padding: 0.75rem;
-      border: none;
       border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--container-bg);
+      color: var(--fg);
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
       transition: background 0.3s;
     }
-    .file-wrapper button:hover {
+    button:hover {
       background: var(--primary-hover);
     }
-    .file-info {
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .status {
-      margin-top: 1rem;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 3px solid var(--status-info);
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .top-bar h2 {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
-    }
-    .controls {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
     .controls button {
-      flex: 1;
       background: var(--btn-bg);
       color: var(--fg);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
     .controls button:hover {
       background: var(--btn-hover);
     }
-    .refresh-btn.loading svg {
-      animation: spin-left 1s linear infinite;
-    }
-    @keyframes spin-left {
-      0% {transform: rotate(0deg);}
-      100% {transform: rotate(-360deg);}
-    }
     #gallery {
+      margin-top: 1.5rem;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 1rem;
-      margin-top: 1rem;
-    }
-    .gallery-list #gallery {
-      display: flex !important;
-      flex-direction: column;
     }
     .item {
       background: var(--container-bg);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 8px;
+      border-radius: 0.75rem;
+      padding: 0.5rem;
       text-align: center;
-      overflow: hidden;
     }
     .item img, .item video {
       width: 100%;
-      border-radius: 6px;
+      border-radius: 0.5rem;
     }
     .caption {
-      font-size: 12px;
-      margin-top: 5px;
-      word-break: break-word;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      color: var(--fg);
+    }
+    .logout-btn {
+      background: var(--status-error);
+      color: white;
+    }
+    .logout-btn:hover {
+      opacity: 0.9;
     }
     @media (max-width: 480px) {
       .controls {
@@ -171,80 +125,38 @@
     }
   </style>
 </head>
-<body>
-
-<!-- LOGIN FORM -->
-<div id="loginContainer" class="container">
+<body><div id="loginContainer" class="container">
   <h1>Login</h1>
   <form id="loginForm">
-    <input type="password" id="password" placeholder="Masukkan password" required style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:1rem;" />
-    <button type="submit" style="width:100%;padding:10px;border-radius:8px;background:var(--primary);color:white;border:none;">Login</button>
+    <input type="password" id="password" placeholder="Masukkan password" required />
+    <button type="submit">Login</button>
   </form>
-  <div id="loginStatus" style="margin-top:1rem;"></div>
-</div>
-
-<!-- KONTEN UTAMA -->
-<div id="appContainer" style="display: none;">
-  <div class="container">
-    <h1>Upload Foto/Video</h1>
-    <form id="uploadForm">
-      <div class="file-wrapper">
-        <input type="file" name="file" id="fileInput" required />
-        <button type="submit">Upload</button>
-        <div class="file-info">
-          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/>
-          </svg>
-          Maksimal ukuran file: <strong>5MB</strong>
-        </div>
-      </div>
-    </form>
-    <div id="status"></div>
-
-    <div class="top-bar">
-      <h2>
-        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M5 3a2 2 0 00-2 2v4h6V3H5zm8 0v6h6V5a2 2 0 00-2-2h-4zm6 8h-6v6h4a2 2 0 002-2v-4zm-8 6v-6H3v4a2 2 0 002 2h4z"/>
-        </svg>
-        Galeri
-      </h2>
-      <div class="controls">
-        <button type="button" onclick="toggleView()">
-          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/>
-          </svg> Tampilan
-        </button>
-        <button type="button" onclick="toggleTheme()">
-          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 3a9 9 0 100 18 9 9 0 000-18zM2 12a10 10 0 1110 10A10 10 0 012 12z"/>
-          </svg> Mode
-        </button>
-        <button type="button" class="refresh-btn" id="refreshBtn" onclick="loadGallery()">
-          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6s-2.7 6-6 6a6 6 0 01-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z"/>
-          </svg> Refresh
-        </button>
-        <button type="button" onclick="logout()" style="background:#dc2626;color:white;">
-          Logout
-        </button>
-      </div>
+  <div id="loginStatus"></div>
+</div><div id="appContainer" class="container" style="display:none;">
+  <h1>Upload Foto/Video</h1>
+  <form id="uploadForm">
+    <div class="file-wrapper">
+      <input type="file" name="file" id="fileInput" required />
+      <button type="submit">Upload</button>
+      <div class="file-info">Maksimal ukuran file: <strong>5MB</strong></div>
     </div>
-
-    <label for="filterDate" style="display:block;margin-top:1rem;">Filter berdasarkan tanggal upload:</label>
-    <input type="date" id="filterDate" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc; width: 100%;" />
-
-    <label for="filterType" style="display:block;">Tampilkan:</label>
-    <select id="filterType" onchange="loadGallery()" style="margin-bottom:1rem; padding: 0.5rem; border-radius: 5px; border:1px solid #ccc; width: 100%;">
-      <option value="all">Semua</option>
-      <option value="image">Gambar Saja</option>
-      <option value="video">Video Saja</option>
-    </select>
-
-    <div id="gallery">Memuat...</div>
+  </form>
+  <div class="controls">
+    <button onclick="toggleView()">Tampilan</button>
+    <button onclick="toggleTheme()">Mode</button>
+    <button onclick="loadGallery()">Refresh</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
-</div>
-
-<script>
+  <label for="filterDate">Filter berdasarkan tanggal upload:</label>
+  <input type="date" id="filterDate" onchange="loadGallery()" />
+  <label for="filterType">Tampilkan:</label>
+  <select id="filterType" onchange="loadGallery()">
+    <option value="all">Semua</option>
+    <option value="image">Gambar</option>
+    <option value="video">Video</option>
+  </select>
+  <div id="gallery">Memuat...</div>
+</div><script>
   const root = document.documentElement;
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
   const galleryContainer = document.body;
@@ -261,12 +173,11 @@
 
   function applySystemTheme() {
     const saved = localStorage.getItem("theme");
-    if (saved) return setTheme(saved);
-    setTheme(prefersDark.matches ? "dark" : "light");
+    setTheme(saved || (prefersDark.matches ? "dark" : "light"));
   }
 
   function toggleView() {
-    galleryContainer.classList.toggle('gallery-list');
+    galleryContainer.classList.toggle("gallery-list");
   }
 
   applySystemTheme();
@@ -275,39 +186,27 @@
     e.preventDefault();
     const fileInput = document.getElementById('fileInput');
     const file = fileInput.files[0];
-    const status = document.getElementById('status');
-
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      status.innerHTML = `<div class="status error">File terlalu besar (max 5MB)</div>`;
-      return;
-    }
-
+    if (!file || file.size > 5 * 1024 * 1024) return alert("File tidak valid (maks 5MB)");
     const form = new FormData();
     form.append('file', file);
-    status.innerHTML = `<div class="status loading"><div class="spinner"></div> Mengunggah...</div>`;
-
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: form });
       const data = await res.json();
       if (data.ok) {
-        status.innerHTML = `<div class="status success">Berhasil! <a href="${data.url}" target="_blank">Lihat</a></div>`;
+        alert("Berhasil diupload!");
         fileInput.value = '';
-        setTimeout(() => loadGallery(), 3000);
+        loadGallery();
       } else {
-        status.innerHTML = `<div class="status error">Gagal: ${data.error}</div>`;
+        alert("Gagal: " + data.error);
       }
     } catch (err) {
-      status.innerHTML = `<div class="status error">Error: ${err.message}</div>`;
+      alert("Error: " + err.message);
     }
   });
 
   async function loadGallery() {
     const gallery = document.getElementById('gallery');
-    const refreshBtn = document.getElementById('refreshBtn');
-    refreshBtn.classList.add('loading');
     gallery.innerHTML = 'Memuat...';
-
     try {
       const res = await fetch('/api/list');
       const data = await res.json();
@@ -320,82 +219,58 @@
         const matchDate = filterDate ? (f.date && f.date.slice(0, 10) === filterDate) : true;
         const matchType =
           filterType === 'image' ? f.isImage :
-          filterType === 'video' ? f.isVideo :
-          true;
+          filterType === 'video' ? f.isVideo : true;
         return matchDate && matchType;
       });
 
+      gallery.innerHTML = '';
       if (filtered.length === 0) {
-        gallery.innerHTML = '<p>Tidak ada file sesuai filter.</p>';
+        gallery.innerHTML = '<p>Tidak ada file.</p>';
         return;
       }
 
-      gallery.innerHTML = '';
       filtered.forEach(file => {
         const item = document.createElement('div');
         item.className = 'item';
-
         const link = document.createElement('a');
         link.href = file.url;
         link.download = file.name;
         link.target = '_blank';
 
-        let media;
-        if (file.isImage) {
-          media = document.createElement('img');
-          media.src = file.url;
-          media.alt = file.name;
-        } else if (file.isVideo) {
-          media = document.createElement('video');
-          media.src = file.url;
-          media.controls = true;
-        } else {
-          media = document.createElement('div');
-          media.textContent = file.name;
-        }
+        const media = file.isImage ? new Image() : document.createElement('video');
+        media.src = file.url;
+        if (file.isVideo) media.controls = true;
+        link.appendChild(media);
 
         const caption = document.createElement('div');
         caption.className = 'caption';
-        const uploadDate = new Date(file.date);
-        caption.innerHTML = `${file.name}<br><small>${uploadDate.toLocaleDateString()}</small>`;
+        caption.innerHTML = `${file.name}<br><small>${new Date(file.date).toLocaleDateString()}</small>`;
 
-        link.appendChild(media);
         item.appendChild(link);
         item.appendChild(caption);
         gallery.appendChild(item);
       });
     } catch (err) {
-      gallery.innerHTML = `<p style="color:red;">Gagal memuat galeri: ${err.message}</p>`;
-    } finally {
-      refreshBtn.classList.remove('loading');
+      gallery.innerHTML = `<p style="color:red;">Gagal memuat: ${err.message}</p>`;
     }
   }
 
-  // LOGIN HANDLER
   document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     const pw = document.getElementById('password').value;
-    const status = document.getElementById('loginStatus');
-    status.innerHTML = "Memverifikasi...";
-
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pw })
-      });
-
-      const data = await res.json();
-      if (data.ok) {
-        localStorage.setItem('loggedIn', 'true');
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'block';
-        loadGallery();
-      } else {
-        status.innerHTML = `<span style="color:red;">${data.error}</span>`;
-      }
-    } catch (err) {
-      status.innerHTML = `<span style="color:red;">${err.message}</span>`;
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      localStorage.setItem('loggedIn', 'true');
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('appContainer').style.display = 'block';
+      loadGallery();
+    } else {
+      document.getElementById('loginStatus').innerText = data.error;
     }
   });
 
@@ -411,7 +286,5 @@
     localStorage.removeItem('loggedIn');
     location.reload();
   }
-</script>
-
-</body>
+</script></body>
 </html>
