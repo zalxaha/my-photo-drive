@@ -6,6 +6,18 @@
   <title>Upload Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      max-width: 100vw;
+    }
+
     :root {
       --bg: #f3f4f6;
       --fg: #111;
@@ -19,6 +31,7 @@
       --status-error: #dc2626;
       --status-info: #2563eb;
     }
+
     [data-theme="dark"] {
       --bg: #111827;
       --fg: #f9fafb;
@@ -29,21 +42,19 @@
       --btn-bg: #374151;
       --btn-hover: #4b5563;
     }
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-      max-width: 100vw;
-    }
+
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg);
       color: var(--fg);
-      margin: 0;
-      padding: 2rem;
+      padding: 2rem 1rem;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       transition: background 0.3s, color 0.3s;
     }
+
     .container {
       max-width: 520px;
       width: 100%;
@@ -52,10 +63,12 @@
       border-radius: 1rem;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
+
     h1 {
       text-align: center;
       margin-bottom: 1.5rem;
     }
+
     .file-wrapper {
       display: flex;
       flex-direction: column;
@@ -65,9 +78,11 @@
       border-radius: 1rem;
       margin-bottom: 1rem;
     }
+
     .file-wrapper input[type="file"] {
       font-family: inherit;
     }
+
     .file-wrapper button {
       background: var(--primary);
       color: white;
@@ -78,15 +93,18 @@
       cursor: pointer;
       transition: background 0.3s;
     }
+
     .file-wrapper button:hover {
       background: var(--primary-hover);
     }
+
     .file-info {
       font-size: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .status {
       margin-top: 1rem;
       font-size: 14px;
@@ -94,6 +112,7 @@
       align-items: center;
       gap: 8px;
     }
+
     .spinner {
       width: 18px;
       height: 18px;
@@ -102,9 +121,11 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
     .top-bar h2 {
       display: flex;
       align-items: center;
@@ -112,12 +133,14 @@
       font-size: 1.25rem;
       margin-bottom: 1rem;
     }
+
     .controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 0.5rem;
       margin-top: 1rem;
     }
+
     .controls button {
       background: var(--btn-bg);
       color: var(--fg);
@@ -132,26 +155,32 @@
       justify-content: center;
       gap: 6px;
     }
+
     .controls button:hover {
       background: var(--btn-hover);
     }
+
     .refresh-btn.loading svg {
       animation: spin-left 1s linear infinite;
     }
+
     @keyframes spin-left {
       0% {transform: rotate(0deg);}
       100% {transform: rotate(-360deg);}
     }
+
     #gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 1rem;
       margin-top: 1rem;
     }
+
     .gallery-list #gallery {
       display: flex !important;
       flex-direction: column;
     }
+
     .item {
       background: var(--container-bg);
       border: 1px solid var(--border-color);
@@ -160,10 +189,12 @@
       text-align: center;
       overflow: hidden;
     }
+
     .item img, .item video {
       width: 100%;
       border-radius: 6px;
     }
+
     .caption {
       font-size: 12px;
       margin-top: 5px;
@@ -173,7 +204,7 @@
 </head>
 <body>
 
-<!-- LOGIN FORM -->
+<!-- LOGIN -->
 <div id="loginContainer" class="container">
   <h1>Login</h1>
   <form id="loginForm">
@@ -183,7 +214,7 @@
   <div id="loginStatus" style="margin-top:1rem;"></div>
 </div>
 
-<!-- KONTEN UTAMA -->
+<!-- APP -->
 <div id="appContainer" style="display: none;">
   <div class="container">
     <h1>Upload Foto/Video</h1>
