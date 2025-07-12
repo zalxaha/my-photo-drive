@@ -1,8 +1,4 @@
-const express = require('express');
 const { Octokit } = require('@octokit/rest');
-require('dotenv').config();
-
-const router = express.Router();
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
@@ -10,7 +6,7 @@ const GH_OWNER = process.env.GH_OWNER;
 const GH_REPO = process.env.GH_REPO;
 const BRANCH = process.env.GH_BRANCH || 'main';
 
-router.get('/api/list', async (req, res) => {
+module.exports = async (req, res) => {
   try {
     const { data } = await octokit.repos.getContent({
       owner: GH_OWNER,
@@ -25,7 +21,7 @@ router.get('/api/list', async (req, res) => {
         const [timestamp, ...rest] = f.name.split('-');
         const name = rest.join('-') || f.name;
         const tsNumber = Number(timestamp);
-        const isValid = !isNaN(tsNumber) && tsNumber > 1e12; // pastikan ini timestamp ms
+        const isValid = !isNaN(tsNumber) && tsNumber > 1e12;
 
         return {
           name,
@@ -36,10 +32,8 @@ router.get('/api/list', async (req, res) => {
         };
       });
 
-    res.json({ ok: true, files });
+    res.status(200).json({ ok: true, files });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-module.exports = router;
+};
