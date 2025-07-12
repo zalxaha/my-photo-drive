@@ -1,65 +1,45 @@
-const express  = require('express');
-const multer   = require('multer');
 const { Octokit } = require('@octokit/rest');
 const sanitize = require('sanitize-filename');
-const rateLimit = require('express-rate-limit');
-require('dotenv').config();
-
-const app = express();
-
-// ⬇️ beri tahu Express soal proxy
-app.set('trust proxy', 1);
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },    // 10 MB
-  fileFilter(_, file, cb) {
-    const ok = /image\/|video\//.test(file.mimetype);
-    cb(ok ? null : new Error('File type not allowed'), ok);
-  }
-});
-
-// Rate-limiter
-app.use(rateLimit({
-  windowMs: 60_000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false
-}));
+const formidable = require('formidable-serverless');
+const fs = require('fs');
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-
 const { GH_OWNER, GH_REPO } = process.env;
 const BRANCH = process.env.GH_BRANCH || 'main';
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
-    const safeName = `${Date.now()}-${sanitize(req.file.originalname)}`;
-    const content  = req.file.buffer.toString('base64');
+  const form = new formidable.IncomingForm();
+  form.maxFileSize = 10 * 1024 * 1024;
 
-    await octokit.repos.createOrUpdateFileContents({
-      owner: GH_OWNER,
-      repo: GH_REPO,
-      path: `uploads/${safeName}`,
-      message: `upload ${safeName}`,
-      content,
-      branch: BRANCH,
-      committer: { name: 'Upload Bot', email: 'bot@example.com' }
-    });
+  form.parse(req, async (err, fields, files) => {
+    try {
+      if (err) return res.status(400).json({ error: err.message });
 
-    res.json({
-      ok: true,
-      url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${safeName}`
-    });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
+      const file = files.file;
+      if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
-// daftar file
-const listRoute = require('./list');
-app.use(listRoute);
+      const buffer = fs.readFileSync(file.path);
+      const base64 = buffer.toString('base64');
+      const safeName = `${Date.now()}-${sanitize(file.name)}`;
 
-module.exports = app;
+      await octokit.repos.createOrUpdateFileContents({
+        owner: GH_OWNER,
+        repo: GH_REPO,
+        path: `uploads/${safeName}`,
+        message: `upload ${safeName}`,
+        content: base64,
+        branch: BRANCH,
+        committer: { name: 'Upload Bot', email: 'bot@example.com' }
+      });
+
+      res.status(200).json({
+        ok: true,
+        url: `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${BRANCH}/uploads/${safeName}`
+      });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+};
